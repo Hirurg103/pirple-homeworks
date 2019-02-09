@@ -10,8 +10,10 @@ const server = http.createServer(function(req, res) {
 
     if(method == 'POST' && path == '/hello') {
         res.setHeader('Content-Type', 'application/json');
+
         const payload = { what_is_this: 'First HW from pirple' };
         const payloadString = JSON.stringify(payload);
+
         res.end(payloadString);
     } else {
         res.writeHead(404);
