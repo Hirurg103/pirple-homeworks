@@ -11,7 +11,7 @@ const appendToLog = function(msg) {
     if(!err) {
       const time = new Date().toISOString();
 
-      fs.appendFile(logFileDescriptor, `${time} ${msg}`, function(err) {
+      fs.appendFile(logFileDescriptor, `${time} ${msg}\n`, function(err) {
         if(!err) {
           fs.close(logFileDescriptor, function(err) {
             if(err) {
@@ -29,7 +29,7 @@ const appendToLog = function(msg) {
 };
 
 logger.info = function(msg) {
-  appendToLog(`[INFO] ${msg}\n`);
+  appendToLog(`[INFO] ${msg}`);
 };
 
 module.exports = logger;
