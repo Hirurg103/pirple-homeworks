@@ -1,3 +1,5 @@
+const utils = require('./../utils');
+
 const buildRoutes = function(callback) {
 
   const routes = {
@@ -45,6 +47,10 @@ const buildRoutes = function(callback) {
 
   const placehoders = [':id'];
 
+  const isPlaceholder = function(routePathFragment) {
+    return placehoders.indexOf(routePathFragment) > -1;
+  };
+
   const matches = function(path, routePath) {
     if(path.httpMethod != routePath.httpMethod)
       return false;
@@ -55,25 +61,51 @@ const buildRoutes = function(callback) {
     return path.fragments.every(function(fragment, idx) {
       const routePathFragment = routePath.fragments[idx];
 
-      return fragment == routePathFragment || placehoders.indexOf(routePathFragment) >= -1;
+      return fragment == routePathFragment || isPlaceholder(routePathFragment);
     });
   };
 
-  routes.resolve = function(httpMethod, path) {
-    const fragments = path.split('/');
+  const getFragments = function(path) {
+    return path.replace(/^\/+|\/+$/g, '').split('/');
+  };
 
-    const foundPath = routes.paths.find(function(path) {
+  const extractParams = function(fragments, routePathFragments) {
+    let params = {};
+
+    fragments.forEach(function(fragment, idx) {
+      const routePathFragment = routePathFragments[idx];
+
+      if(isPlaceholder(routePathFragment)) {
+        const paramName = routePathFragment.replace(/^\:/, '');
+
+        params = utils.merge(params, { [paramName]: fragment });
+      }
+    });
+
+    return params;
+  };
+
+  routes.resolve = function(httpMethod, path) {
+    const fragments = getFragments(path);
+
+    let foundRoutePath = routes.paths.find(function(routePath) {
       const currentPath = { httpMethod, fragments };
 
-      return matches(currentPath, path);
+      return matches(currentPath, routePath);
     });
-    return foundPath;
+
+    if(foundRoutePath) {
+      const pathParams = extractParams(fragments, foundRoutePath.fragments);
+
+      foundRoutePath = utils.merge(foundRoutePath, { params: pathParams });
+    }
+
+    return foundRoutePath;
   };
 
   callback(routes);
 
   return routes;
-
 };
 
 module.exports = buildRoutes;

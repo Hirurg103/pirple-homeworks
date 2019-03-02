@@ -1,10 +1,7 @@
 const routes = require('./routes');
 const url = require('url');
 const logger = require('./logger');
-
-const resolveController = function(httpMethod, path) {
-  return routes.resolve(httpMethod, path);
-};
+const utils = require('./utils');
 
 const router = function(req, res) {
   const httpMethod = req.method.toUpperCase();
@@ -13,7 +10,14 @@ const router = function(req, res) {
 
   logger.info(`Started ${httpMethod} ${path}`);
 
-  const controller = resolveController(httpMethod, path);
+  const routePath = routes.resolve(httpMethod, path);
+  let params = parsedUrl.query;
+  if(routePath) {
+    params = utils.merge(params, routePath.params);
+  }
+
+  logger.info(`  Params ${JSON.stringify(params)}`);
+
   //controller(params, req, res);
   res.end('done');
 };
