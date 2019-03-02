@@ -29,7 +29,6 @@ const appendToLog = function(msg) {
 };
 
 logger.info = function(msg) {
-
   appendToLog(`[INFO] ${msg}\n`);
 };
 
