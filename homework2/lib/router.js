@@ -2,6 +2,11 @@ const routes = require('./routes');
 const url = require('url');
 const logger = require('./logger');
 const utils = require('./utils');
+const ApplicationController = require('./../app/controllers/application_controller');
+
+const findController = function(routePath) {
+  return require(`../app/controllers/${routePath.controller}_controller`);
+};
 
 const router = function(req, res) {
   const httpMethod = req.method.toUpperCase();
@@ -18,8 +23,17 @@ const router = function(req, res) {
 
   logger.info(`  Params ${JSON.stringify(params)}`);
 
-  //controller(params, req, res);
-  res.end('done');
+  if(routePath) {
+    logger.info(`Processing ${routePath.controller}_controller#${routePath.controllerMethod}`);
+
+    const controller = findController(routePath);
+    new controller(params, req, res)[routePath.controllerMethod]();
+
+  } else {
+    logger.info(`Processing application_controller#notFound`);
+
+    new ApplicationController(params, req, res).notFound();
+  }
 };
 
 module.exports = router;
