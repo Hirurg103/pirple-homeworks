@@ -15,15 +15,15 @@ const appendToLog = function(msg) {
         if(!err) {
           fs.close(logFileDescriptor, function(err) {
             if(err) {
-              console.log(`Error closing log file ${err}`);
+              console.log(`Error closing log: ${err}`);
             }
           });
         } else {
-          console.log(`Error writing to log ${err}`);
+          console.log(`Error writing to log: ${err}`);
         }
       });
     } else {
-      console.log(`Error opening log file ${err}`);
+      console.log(`Error opening log: ${err}`);
     }
   });
 };
